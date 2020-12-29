@@ -61,7 +61,7 @@ function Location(city, geoData) {
   this.longitude = geoData[0].lon;
 }
 
-function Restaurant(result) {
+function Weather(result) {
   this.restaurant = 
   this. cuisines = 
   this.locality = 
