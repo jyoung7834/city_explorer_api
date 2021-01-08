@@ -33,14 +33,10 @@ app.get('/location', (request, response) => {
 
 
 app.get('/weather', getWeather);
-app.get('/meetups', getMeetups);
 //Route for the Movie API
 app.get('/movies', getMovies);
-//Route for Trails Project API
-// app.get('/trails', getTrails);
 //ROUTE FOR YELP FUSION API
 app.get('/yelp', getYelp);
-
 
 app.listen(PORT, () => {
   console.log(`Now listening on port, ${PORT}`);
@@ -58,11 +54,6 @@ function Weather(day) {
   this.forecast = day.summary;
   this.time = new Date(day.tome * 1000).toString().slice(0, 5);
 }
-function Meetup(meetup) {
-  this.link = meetup.link;
-  this.name = meetup.group.name;
-  this.creation_date = new Date(meetup.group.created).toString().slice(0, 15);
-}
 
 function Movie(movie) {
   this.title = movie.title;
@@ -75,7 +66,7 @@ function Movie(movie) {
 }
 
 
-functionYelp(biz) {
+function Yelp(biz) {
   this.name = biz.name;
   this.url = biz.url;
   this.rating = biz.rating;
@@ -114,7 +105,7 @@ function getLocation(query) {
             console.log('From API location');
 
             //Make err if problem occures with API request
-            if (!data.body.results.length) { throw 'null data' }
+            if (!data.body.results.length) { throw 'no data' }
 
             //If so, create an instance of Locatin
             else {
