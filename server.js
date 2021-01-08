@@ -24,7 +24,7 @@ client.on('error', err => console.err(err));
 app.get('/location', (request, response) => {
   getLocation(request.query.data)
     .then(location => {
-      console.log('server.js, location);
+      console.log('server.js', location);
       response.send(location)
     })
     .catch(error => handleError(error, response));
@@ -106,7 +106,7 @@ function getLocation(query) {
 
         //then retrieve information from API
       } else {
-        console.lot('New API request');
+        console.log('New API request');
         const url = `https://majps.googleapis. com//maps/api/geocode/json?adddress=${query}&key=${process.env.GEOCODE_API_KEY}`;
 
         return superagent.get(url)
