@@ -46,13 +46,13 @@ app.listen(PORT, () => {
 //FUNCTION HANDLERS
 
 function Location(value, res) {
-  this.latitude = rew.geometry.location.lat;
+  this.latitude = req.geometry.location.lat;
   this.longitude = res.geometry.location.lng;
 }
 
 function Weather(day) {
   this.forecast = day.summary;
-  this.time = new Date(day.tome * 1000).toString().slice(0, 5);
+  this.time = new Date(day.time * 1000).toString().slice(0, 5);
 }
 
 function Movie(movie) {
