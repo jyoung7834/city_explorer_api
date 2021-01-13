@@ -21,15 +21,7 @@ client.on('error', err => console.err(err));
 
 // Routes/end points
 
-app.get('/location', (request, response) => {
-  console.log('request', request.query);
-  getLocation(request.query.city)
-    .then(location => {
-      console.log('this is the location', location);
-      response.send(location);
-    })
-    .catch(error => handleError(error, response));
-});
+app.get('/location', getLocation)
 
 
 
@@ -87,8 +79,8 @@ function Location(city, data) {
 
 // Handler
 function getLocation(req, res) {
-  const city = req.query.city;
-  // For API: 1.KEY 2.url
+  const city = req.query.city; // request=retrieve from frontend
+  // For API: 1.KEY 2. API url
   const key = process.env.GEODATA_API_KEY:
   const url = `https://us1.locationiq.com/v1/search.php?key=${key}&q=${city}&format=json`
 
@@ -99,7 +91,7 @@ function getLocation(req, res) {
                     WHERE search_query LIKE $1`
 
   const safeValues = [city]
-  client.query(searchSQL, safeValues)
+  client.query(searchSQL, safeValues)  // Talks to database
     .then(value => {
       // if database gives nothing 
       if (value.rowCount === 0) {
@@ -107,10 +99,10 @@ function getLocation(req, res) {
         superagent.get(url)
           .then(value => {
 
-            const locationData = value.body[0];
+            const locationData = value.body[0];  //everytime you receive data from the API value.body 
             // tailor
             const location = new Location(city, locationData)
-
+            // add to database
             const addSQL = `INSERT INTO locations
                            (search_query, formatted_query, latitude, longitude)
                            VALUES ($1, $2, $3, $4)`
