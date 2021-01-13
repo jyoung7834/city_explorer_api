@@ -42,12 +42,8 @@ app.get('/location', (request, response) => {
 
 
 
-//FUNCTION HANDLERS
 
-function Location(value, res) {
-  this.latitude = req.geometry.location.lat;
-  this.longitude = res.geometry.location.lng;
-}
+
 
 // function Weather(day) {
 //   this.forecast = day.summary;
@@ -81,72 +77,66 @@ function handleError(err, res) {
   if (res) res.status(404).send('Sorry, not found');
 }
 
+// Object Constructor
+function Location(city, data) {
+  this.search_query = city;
+  this.formatted_query = data.display_name;
+  this.latitude = data.lat;
+  this.longitude = data.lon;
+}
 
-function getLocation(query) {
-  console.log('query', query);
-  // Make query string to check for the existence of the location
-  const SQL = `SELECT * FROM locations WHERE search_query=$1;`;
-  const values = [query];
+// Handler
+function getLocation(req, res) {
+  const city = req.query.city;
+  // For API: 1.KEY 2.url
+  const key = process.env.GEODATA_API_KEY:
+  const url = `https://us1.locationiq.com/v1/search.php?key=${key}&q=${city}&format=json`
 
-  // create the query of the database
-  return client.query(SQL, values)
-    .then(result => {
-      if (result.rowCount > 0) {
-        console.log('SQL working');
-        return result.rows[0];
+  // Use Database
+  // For database: SQL statement, safe values
+  const searchSQL = `SELECT *
+                    FROM locations
+                    WHERE search_query LIKE $1`
 
-        //then retrieve information from API
-      } else {
-        console.log('New API request');
-        const url =`https://us1.locationiq.com/v1/search.php?key=${key}&format=json&q=Empire%20State%20Building` 
-       
-        // https://us1.locationiq.com/v1/search.php?key=%3CYour_API_Access_Token%3E&format=json&q=Empire%20State%20Building
-        
-        // 'https://us1.location.com/v1/search.php?key=${key}&q${city}&format=json'
-        
-        // `https://maps.googleapis.com/maps/api/geocode/json?city=${query}&key=${process.env.GEOCODE_API_KEY}`;
+  const safeValues = [city]
+  client.query(searchSQL, safeValues)
+    .then(value => {
+      // if database gives nothing 
+      if (value.rowCount === 0) {
+        //request to API using superagent
+        superagent.get(url)
+          .then(value => {
 
-        return superagent.get(url)
-          .then(data => {
-            console.log('From API location');
+            const locationData = value.body[0];
+            // tailor
+            const location = new Location(city, locationData)
 
-            //Make err if problem occures with API request
-            if (!data.body.results.length) { throw 'no data' }
+            const addSQL = `INSERT INTO locations
+                           (search_query, formatted_query, latitude, longitude)
+                           VALUES ($1, $2, $3, $4)`
+            
+            const safeValues = [locations.search_query, locations.formatted_query, locations.latitude, locations.longitude]
+            client.query(addSQL, safeValues)
 
-            //If so, create an instance of Locatin
-            else {
-              let location = location = new Location(query, data.body.results[0]);
-              console.log('location object from location API', location);
-
-              //make query string to INSERT a new record with the location data
-              let newSQL = 'INSERT INTO locations (search_query, formatted_query, latitude, longitude) Values ($1, $2, $3, $4) RETURNING id;';
-              console.log('newValues', newSQL);
-              let newValues = Object.values(location);
-              console.log('neValues', newValues);
-
-              //Place the record to the database
-              return client.query(newSQL, newValues)
-                .then(result => {
-                  console.log('result.rows', result.rows);
-                  // attach the id of the newly created record to the instance of location.
-                  // this will be used to connect the location to the other databases.
-                  console.log('result.rows[0].id', result.rows[0].id);
-                  location.id = result.rows[0].id;
-                  return location;
-                })
-                .catch(console.error);
-            }
+            // response
+            res.status(200).json(location)
           })
-          .catch(error => console.log('Error in SQL Call', error));
-
+          // database gives you data 
+      } else if (value.rowCount === 1 ) {
+        res.status(200).json(value.rows[0])
       }
-    });
-}   
+
+    })
+
+
+
+
+}
 
 client.connect()
-  .then(( ) => {
+  .then(() => {
     app.listen(PORT, () => {
       console.log(`Now listening on port, ${PORT}`);
     });
-    
+
   });
