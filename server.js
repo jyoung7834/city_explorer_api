@@ -33,51 +33,51 @@ app.get('/location', (request, response) => {
 
 
 
-// app.get('/weather', getWeather);
+app.get('/weather', getWeather);
 // //Route for the Movie API
-// app.get('/movies', getMovies);
+app.get('/movies', getMovies);
 // //ROUTE FOR YELP FUSION API
-// app.get('/yelp', getYelp);
-// app.get('*', status404)
+app.get('/yelp', getYelp);
+app.get('*', status404)
 
 
 
 //FUNCTION HANDLERS
 
-function Location(value, res) {
+function Location(req, res) {
   this.latitude = req.geometry.location.lat;
   this.longitude = res.geometry.location.lng;
 }
 
-// function Weather(day) {
-//   this.forecast = day.summary;
-//   this.time = new Date(day.time * 1000).toString().slice(0, 5);
-// }
+function Weather(day) {
+  this.forecast = day.summary;
+  this.time = new Date(day.time * 1000).toString().slice(0, 5);
+}
 
-// function Movie(movie) {
-//   this.title = movie.title;
-//   this.released_on = movie.release_date;
-//   this.total_votes = movie.vote_count;
-//   this.average_votes = movie.votes_average;
-//   this.popularity = movie.popularity;
-//   this.image_url = `https://image.tmdb.org/t/p/original$movie.poster_path}`;
-//   this.overview = movie.overview;
-// }
+function Movie(movie) {
+  this.title = movie.title;
+  this.released_on = movie.release_date;
+  this.total_votes = movie.vote_count;
+  this.average_votes = movie.votes_average;
+  this.popularity = movie.popularity;
+  this.image_url = `https://image.tmdb.org/t/p/original$movie.poster_path}`;
+  this.overview = movie.overview;
+}
 
 
-// function Yelp(biz) {
-//   this.name = biz.name;
-//   this.url = biz.url;
-//   this.rating = biz.rating;
-//   this.price = biz.price;
-//   this.image_url = biz.image_url;
-// }
+function Yelp(biz) {
+  this.name = biz.name;
+  this.url = biz.url;
+  this.rating = biz.rating;
+  this.price = biz.price;
+  this.image_url = biz.image_url;
+}
 
 
 //  HELPER FUNCTIONS
 
-function handleError(err, res) {
-  console.error(err);
+function handleError(req, res) {
+  console.error(req);
   if (res) res.status(404).send('Sorry, not found');
 }
 
@@ -98,22 +98,16 @@ function getLocation(query) {
         //then retrieve information from API
       } else {
         console.log('New API request');
-        const url =`https://us1.locationiq.com/v1/search.php?key=${key}&format=json&q=Empire%20State%20Building` 
-       
-        // https://us1.locationiq.com/v1/search.php?key=%3CYour_API_Access_Token%3E&format=json&q=Empire%20State%20Building
-        
-        // 'https://us1.location.com/v1/search.php?key=${key}&q${city}&format=json'
-        
-        // `https://maps.googleapis.com/maps/api/geocode/json?city=${query}&key=${process.env.GEOCODE_API_KEY}`;
+        const url = `https://us1.locationiq.com/v1/search.php?key=${key}&format=json&q=${process.env.GEOCODE_API_KEY}`;
 
         return superagent.get(url)
           .then(data => {
             console.log('From API location');
 
             //Make err if problem occures with API request
-            if (!data.body.results.length) { throw 'no data' }
+            if (!data.body.results.length) { throw 'no data' };
 
-            //If so, create an instance of Locatin
+            //If so, create an instance of Locating
             else {
               let location = location = new Location(query, data.body.results[0]);
               console.log('location object from location API', location);
@@ -141,12 +135,12 @@ function getLocation(query) {
 
       }
     });
-}   
+}
 
 client.connect()
-  .then(( ) => {
+  .then(() => {
     app.listen(PORT, () => {
       console.log(`Now listening on port, ${PORT}`);
     });
-    
+
   });
