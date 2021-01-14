@@ -22,10 +22,7 @@ client.on('error', err => console.err(err));
 // Routes/end points
 
 app.get('/location', getLocation)
-
-
-
-// app.get('/weather', getWeather);
+app.get('/weather', getWeather);
 // //Route for the Movie API
 // app.get('/movies', getMovies);
 // //ROUTE FOR YELP FUSION API
@@ -37,10 +34,6 @@ app.get('/location', getLocation)
 
 
 
-// function Weather(day) {
-//   this.forecast = day.summary;
-//   this.time = new Date(day.time * 1000).toString().slice(0, 5);
-// }
 
 // function Movie(movie) {
 //   this.title = movie.title;
@@ -95,9 +88,9 @@ function getLocation(req, res) {
     .then(value => {
       // if database gives nothing 
       if (value.rowCount === 0) {
-        //request to API using superagent
+        //request to API using superagent (how you talk to the API)
         superagent.get(url)
-          .then(value => {
+          .then(value => { //response from the API is .then
 
             const locationData = value.body[0];  //everytime you receive data from the API value.body 
             // tailor
@@ -119,10 +112,29 @@ function getLocation(req, res) {
       }
 
     })
+}
 
+function Weather(day) {
+  this.forecast = day.summary;
+  this.time = new Date(day.time * 1000).toString().slice(0, 5);
+}
 
+function getWeather(req, res) {
+  const lat = req.query.latitude;
+  const lon = req.query.longitude;
+  const key = process.env.WEATHERBIT_API_KEY;
+  const url = `http://api.weatherbit.io/v2.0/forecast/daily?&lat=${lat}&lon=${log}&key=${key}`
 
+  superagent.get(url)
+    .then(value =>{
+      const weatherData = value.body.data;
+      const weather = weatherData.map(value => { /
+        return new Weather(value)
+      })
 
+      res.status(200).json(weather)
+
+    } )
 }
 
 client.connect()
