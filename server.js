@@ -20,11 +20,11 @@ const client = new pg.Client(process.env.DATABASE_URL);
 client.on('error', err => console.err(err));
 
 // Routes/end points
-
+//request
 app.get('/location', getLocation)
 app.get('/weather', getWeather);
 // //Route for the Movie API
-// app.get('/movies', getMovies);
+app.get('/movies', getMovies);
 // //ROUTE FOR YELP FUSION API
 // app.get('/yelp', getYelp);
 // app.get('*', status404)
@@ -35,15 +35,6 @@ app.get('/weather', getWeather);
 
 
 
-// function Movie(movie) {
-//   this.title = movie.title;
-//   this.released_on = movie.release_date;
-//   this.total_votes = movie.vote_count;
-//   this.average_votes = movie.votes_average;
-//   this.popularity = movie.popularity;
-//   this.image_url = `https://image.tmdb.org/t/p/original$movie.poster_path}`;
-//   this.overview = movie.overview;
-// }
 
 
 // function Yelp(biz) {
@@ -70,7 +61,7 @@ function Location(city, data) {
   this.longitude = data.lon;
 }
 
-// Handler
+// Location Handler
 function getLocation(req, res) {
   const city = req.query.city; // request=retrieve from frontend
   // For API: 1.KEY 2. API url
@@ -89,7 +80,7 @@ function getLocation(req, res) {
       // if database gives nothing 
       if (value.rowCount === 0) {
         //request to API using superagent (how you talk to the API)
-        superagent.get(url)
+        superagent.get(url) //superagent.get asyncronist call 
           .then(value => { //response from the API is .then
 
             const locationData = value.body[0];  //everytime you receive data from the API value.body 
@@ -135,6 +126,34 @@ function getWeather(req, res) {
       res.status(200).json(weather)
 
     } )
+}
+
+function Movie(movie) {
+  this.title = movie.title;
+  this.overview = movie.overview;
+  this.average_votes = movie.votes_average;
+  this.total_votes = movie.vote_count;
+  this.image_url = `https://image.tmdb.org/t/p/original${movie.poster_path}`;
+  this.popularity = movie.popularity;
+  this.released_on = movie.release_date;
+  }
+
+function getMovies(req, res) {
+  const url = `https://api.themoviedb.org/3/search/movie`;
+  const queryList = {
+    api_key: process.env.MOVIE_API_KEY,
+    query: req.query.search_query
+  }
+
+  superagent.get(url)
+    .query(queryList)
+    .then(value =>{
+      const movieData = value.body.results.map(movie => {
+        return new Movie(movie)
+      }) 
+      res.status(200).json(movieData)
+    })
+
 }
 
 client.connect()
