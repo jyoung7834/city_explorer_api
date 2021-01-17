@@ -1,7 +1,7 @@
 'use strict';
 
 // Step 1: App dependencies/modules
-const express = require('express');
+const express = require('express'); //web framework
 const cors = require('cors');
 const superagent = require('superagent');
 const pg = require('pg');
@@ -31,19 +31,6 @@ app.get('/movies', getMovies);
 
 
 
-
-
-
-
-
-
-// function Yelp(biz) {
-//   this.name = biz.name;
-//   this.url = biz.url;
-//   this.rating = biz.rating;
-//   this.price = biz.price;
-//   this.image_url = biz.image_url;
-// }
 
 
 //  HELPER FUNCTIONS
@@ -90,19 +77,51 @@ function getLocation(req, res) {
             const addSQL = `INSERT INTO locations
                            (search_query, formatted_query, latitude, longitude)
                            VALUES ($1, $2, $3, $4)`
-            
+
             const safeValues = [locations.search_query, locations.formatted_query, locations.latitude, locations.longitude]
             client.query(addSQL, safeValues)
 
             // response
             res.status(200).json(location)
           })
-          // database gives you data 
-      } else if (value.rowCount === 1 ) {
+        // database gives you data 
+      } else if (value.rowCount === 1) {
         res.status(200).json(value.rows[0])
       }
 
     })
+}
+
+function Restaurant(restaurant) {
+  this.name = data.name;
+  this.image_url = data.image_url;
+  this.price = data.price;
+  this.rating = data.rating;
+  this.url = data.url;
+}
+
+function restaurantHandler(req, res) {
+  const numPerPage = 5;
+  const page = req.query.page || 1;
+  const start = ((page - 1) * numPerPage + 1);
+  const url = `https://api.yelp.com/v3/businesses/search`;
+  let queryList = {
+    latitude: req.query.latitude,
+    longitude: req.query.longitude,
+    limit: numPerPage,
+    offset: start
+  };
+
+  superagent.get(url)
+    .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
+    .query(queryList)
+    .then(value => {
+      const restaurantData = value.body.businesses.map(restaurant => {
+        return new Restaurant(restaurant)
+      })
+      res.status(200).json(restaurantData)
+    })
+
 }
 
 function Weather(day) {
@@ -117,15 +136,16 @@ function getWeather(req, res) {
   const url = `http://api.weatherbit.io/v2.0/forecast/daily?&lat=${lat}&lon=${log}&key=${key}`
 
   superagent.get(url)
-    .then(value =>{
+    .then(value => {
       const weatherData = value.body.data;
-      const weather = weatherData.map(value => { /
+      const weather = weatherData.map(value => {
+        /
         return new Weather(value)
       })
 
       res.status(200).json(weather)
 
-    } )
+    })
 }
 
 function Movie(movie) {
@@ -136,7 +156,7 @@ function Movie(movie) {
   this.image_url = `https://image.tmdb.org/t/p/original${movie.poster_path}`;
   this.popularity = movie.popularity;
   this.released_on = movie.release_date;
-  }
+}
 
 function getMovies(req, res) {
   const url = `https://api.themoviedb.org/3/search/movie`;
@@ -147,10 +167,10 @@ function getMovies(req, res) {
 
   superagent.get(url)
     .query(queryList)
-    .then(value =>{
+    .then(value => {
       const movieData = value.body.results.map(movie => {
         return new Movie(movie)
-      }) 
+      })
       res.status(200).json(movieData)
     })
 
