@@ -52,7 +52,7 @@ function Location(city, data) {
 function getLocation(req, res) {
   const city = req.query.city; // request=retrieve from frontend
   // For API: 1.KEY 2. API url
-  const key = process.env.GEODATA_API_KEY:
+  const key = process.env.GEODATA_API_KEY
   const url = `https://us1.locationiq.com/v1/search.php?key=${key}&q=${city}&format=json`
 
   // Use Database
@@ -139,7 +139,7 @@ function getWeather(req, res) {
     .then(value => {
       const weatherData = value.body.data;
       const weather = weatherData.map(value => {
-        /
+       /
         return new Weather(value)
       })
 

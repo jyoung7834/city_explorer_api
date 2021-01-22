@@ -11,3 +11,5 @@ Finish time: 1:05 pm and still working on it.
 Actual time needed to complete: _____
 
 Comments:  When testing node server.js it reads "Now listenin g on port, ${PORT}.  Not communicating with .env file or process.env.PORT is not working. 
+
+Jenner Dulce has been a great help while working on this lab. 
