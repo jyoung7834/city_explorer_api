@@ -139,7 +139,6 @@ function getWeather(req, res) {
     .then(value => {
       const weatherData = value.body.data;
       const weather = weatherData.map(value => {
-       /
         return new Weather(value)
       })
 
