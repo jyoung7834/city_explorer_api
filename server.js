@@ -78,7 +78,7 @@ function getLocation(req, res) {
                            (search_query, formatted_query, latitude, longitude)
                            VALUES ($1, $2, $3, $4)`
 
-            const safeValues = [locations.search_query, locations.formatted_query, locations.latitude, locations.longitude]
+            const safeValues = [location.search_query, location.formatted_query, location.latitude, location.longitude];
             client.query(addSQL, safeValues)
 
             // response
