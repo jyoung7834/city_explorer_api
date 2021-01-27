@@ -21,12 +21,12 @@ client.on('error', err => console.err(err));
 
 // Routes/end points
 //request
-app.get('/location', getLocation)
+app.get('/location', getLocation);
 app.get('/weather', getWeather);
 // //Route for the Movie API
 app.get('/movies', getMovies);
 // //ROUTE FOR YELP FUSION API
-// app.get('/yelp', getYelp);
+app.get('/yelp', getRestaurant);
 // app.get('*', status404)
 
 
@@ -52,16 +52,16 @@ function Location(city, data) {
 function getLocation(req, res) {
   const city = req.query.city; // request=retrieve from frontend
   // For API: 1.KEY 2. API url
-  const key = process.env.GEODATA_API_KEY
+  const key = process.env.GEODATA_API_KEY;
   const url = `https://us1.locationiq.com/v1/search.php?key=${key}&q=${city}&format=json`
 
   // Use Database
   // For database: SQL statement, safe values
   const searchSQL = `SELECT *
                     FROM locations
-                    WHERE search_query LIKE $1`
+                    WHERE search_query LIKE $1`;
 
-  const safeValues = [city]
+  const safeValues = [city];
   client.query(searchSQL, safeValues)  // Talks to database
     .then(value => {
       // if database gives nothing 
@@ -76,20 +76,20 @@ function getLocation(req, res) {
             // add to database
             const addSQL = `INSERT INTO locations
                            (search_query, formatted_query, latitude, longitude)
-                           VALUES ($1, $2, $3, $4)`
+                           VALUES ($1, $2, $3, $4)`;
 
             const safeValues = [location.search_query, location.formatted_query, location.latitude, location.longitude];
-            client.query(addSQL, safeValues)
+            client.query(addSQL, safeValues);
 
             // response
-            res.status(200).json(location)
-          })
+            res.status(200).json(location);
+          });
         // database gives you data 
       } else if (value.rowCount === 1) {
-        res.status(200).json(value.rows[0])
+        res.status(200).json(value.rows[0]);
       }
 
-    })
+    });
 }
 
 function Restaurant(restaurant) {
@@ -100,7 +100,7 @@ function Restaurant(restaurant) {
   this.url = data.url;
 }
 
-function restaurantHandler(req, res) {
+function getRestaurant(req, res) {
   const numPerPage = 5;
   const page = req.query.page || 1;
   const start = ((page - 1) * numPerPage + 1);
@@ -117,10 +117,10 @@ function restaurantHandler(req, res) {
     .query(queryList)
     .then(value => {
       const restaurantData = value.body.businesses.map(restaurant => {
-        return new Restaurant(restaurant)
-      })
-      res.status(200).json(restaurantData)
-    })
+        return new Restaurant(restaurant);
+      });
+      res.status(200).json(restaurantData);
+    });
 
 }
 
@@ -133,18 +133,18 @@ function getWeather(req, res) {
   const lat = req.query.latitude;
   const lon = req.query.longitude;
   const key = process.env.WEATHERBIT_API_KEY;
-  const url = `http://api.weatherbit.io/v2.0/forecast/daily?&lat=${lat}&lon=${log}&key=${key}`
+  const url = `http://api.weatherbit.io/v2.0/forecast/daily?&lat=${lat}&lon=${log}&key=${key}`;
 
   superagent.get(url)
     .then(value => {
       const weatherData = value.body.data;
       const weather = weatherData.map(value => {
-        return new Weather(value)
-      })
+        return new Weather(value);
+      });
 
-      res.status(200).json(weather)
+      res.status(200).json(weather);
 
-    })
+    });
 }
 
 function Movie(movie) {
@@ -162,16 +162,16 @@ function getMovies(req, res) {
   const queryList = {
     api_key: process.env.MOVIE_API_KEY,
     query: req.query.search_query
-  }
+  };
 
   superagent.get(url)
     .query(queryList)
     .then(value => {
       const movieData = value.body.results.map(movie => {
-        return new Movie(movie)
-      })
-      res.status(200).json(movieData)
-    })
+        return new Movie(movie);
+      });
+      res.status(200).json(movieData);
+    });
 
 }
 
