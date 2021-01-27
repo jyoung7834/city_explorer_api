@@ -26,8 +26,8 @@ app.get('/weather', getWeather);
 // //Route for the Movie API
 app.get('/movies', getMovies);
 // //ROUTE FOR YELP FUSION API
-app.get('/yelp', getRestaurant);
-// app.get('*', status404)
+// app.get('/yelp', getRestaurant);
+// // app.get('*', status404)
 
 
 
