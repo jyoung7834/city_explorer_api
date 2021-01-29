@@ -1,5 +1,4 @@
-DROP TABLE IF EXISTS locations; 
--- , weather, movies, restaurants;
+DROP TABLE IF EXISTS locations, weather, movies, restaurants;
 
 CREATE TABLE locations (
   id SERIAL PRIMARY KEY,
@@ -17,7 +16,7 @@ CREATE TABLE weather (
   FOREIGN KEY (location_id) REFERENCES locations (id)
 );
 
--- CREATE TABLE movies (
+CREATE TABLE movies (
   id SERIAL PRIMARY KEY,
   title VARCHAR(255);
   released_on VARCHAR(255),
