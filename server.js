@@ -125,8 +125,9 @@ function getRestaurant(req, res) {
 }
 
 function Weather(day) {
-  this.forecast = day.summary;
-  this.time = new Date(day.time * 1000).toString().slice(0, 5);
+  this.forecast = day.weather.description;
+  this.time = day.datetime;
+  // this.time = new Date(day.time * 1000).toString().slice(0, 5);
 }
 
 function getWeather(req, res) {
@@ -139,6 +140,7 @@ function getWeather(req, res) {
     .then(value => {
       const weatherData = value.body.data;
       const weather = weatherData.map(value => {
+        console.log(value);
         return new Weather(value);
 
       });
