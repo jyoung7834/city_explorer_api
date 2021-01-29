@@ -26,8 +26,8 @@ app.get('/weather', getWeather);
 // //Route for the Movie API
 app.get('/movies', getMovies);
 // //ROUTE FOR YELP FUSION API
-// app.get('/yelp', getRestaurant);
-// // app.get('*', status404)
+app.get('/yelp', getRestaurant);
+app.get('*', handleError);
 
 
 
@@ -93,11 +93,11 @@ function getLocation(req, res) {
 }
 
 function Restaurant(restaurant) {
-  this.name = data.name;
-  this.image_url = data.image_url;
-  this.price = data.price;
-  this.rating = data.rating;
-  this.url = data.url;
+  this.name = restaurant.name;
+  this.image_url = restaurant.image_url;
+  this.price = restaurant.price;
+  this.rating = restaurant.rating;
+  this.url = restaurant.url;
 }
 
 function getRestaurant(req, res) {
