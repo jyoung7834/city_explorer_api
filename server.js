@@ -133,7 +133,7 @@ function getWeather(req, res) {
   const lat = req.query.latitude;
   const lon = req.query.longitude;
   const key = process.env.WEATHERBIT_API_KEY;
-  const url = `http://api.weatherbit.io/v2.0/forecast/daily?&lat=${lat}&lon=${log}&key=${key}`;
+  const url = `http://api.weatherbit.io/v2.0/forecast/daily?&lat=${lat}&lon=${lon}&key=${key}`;
 
   superagent.get(url)
     .then(value => {
