@@ -10,7 +10,7 @@ const pg = require('pg');
 require('dotenv').config();
 
 
-//Step 2:  Set up our application and specify your port 
+//Step 2:  Set up our application and specify your port
 const app = express();
 const PORT = process.env.PORT || 3000;
 app.use(cors());
@@ -53,7 +53,7 @@ function getLocation(req, res) {
   const city = req.query.city; // request=retrieve from frontend
   // For API: 1.KEY 2. API url
   const key = process.env.GEODATA_API_KEY;
-  const url = `https://us1.locationiq.com/v1/search.php?key=${key}&q=${city}&format=json`
+  const url = `https://us1.locationiq.com/v1/search.php?key=${key}&q=${city}&format=json`;
 
   // Use Database
   // For database: SQL statement, safe values
@@ -62,17 +62,17 @@ function getLocation(req, res) {
                     WHERE search_query LIKE $1`;
 
   const safeValues = [city];
-  client.query(searchSQL, safeValues)  // Talks to database
+  client.query(searchSQL, safeValues) // Talks to database
     .then(value => {
-      // if database gives nothing 
+      // if database gives nothing
       if (value.rowCount === 0) {
         //request to API using superagent (how you talk to the API)
-        superagent.get(url) //superagent.get asyncronist call 
+        superagent.get(url) //superagent.get asyncronist call
           .then(value => { //response from the API is .then
 
-            const locationData = value.body[0];  //everytime you receive data from the API value.body 
+            const locationData = value.body[0]; //everytime you receive data from the API value.body
             // tailor
-            const location = new Location(city, locationData)
+            const location = new Location(city, locationData);
             // add to database
             const addSQL = `INSERT INTO locations
                            (search_query, formatted_query, latitude, longitude)
@@ -84,7 +84,7 @@ function getLocation(req, res) {
             // response
             res.status(200).json(location);
           });
-        // database gives you data 
+        // database gives you data
       } else if (value.rowCount === 1) {
         res.status(200).json(value.rows[0]);
       }
