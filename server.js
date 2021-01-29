@@ -140,12 +140,15 @@ function getWeather(req, res) {
       const weatherData = value.body.data;
       const weather = weatherData.map(value => {
         return new Weather(value);
-      });
 
+      });
+      console.log(weather);
       res.status(200).json(weather);
 
     });
+
 }
+
 
 function Movie(movie) {
   this.title = movie.title;
